@@ -1,0 +1,38 @@
+
+<label class=" btn btn-primary mx-auto d-block"><h1>{{quiz.name}}</h1></label>
+<br>
+<div class="qu text-light mx-auto d-block ">
+ <h4 class="text-center" id="publishtext" > </h4> 
+
+ <form   id="publish" action="/user/publishquiz" method="POST">
+      <button  class="btn btn-success d-block mx-auto" name="status" value="1">Publish Now</button>
+      <input type="text" class="form-control" name="id" placeholder="Quiz Name" value="{{quiz.id}}" hidden>
+      </form>
+
+{{# each quiz.questions}}
+<h4 class="d-inline">{{this.title}}</h4><br>
+<ol>
+
+{{# each this.answers}}
+<li>{{this}}</li>
+{{/each}}
+</ol>
+<small class="text-success"> the correct answer is {{this.correct}}</small><br>
+<label class="" >explanation :</label>
+<br>
+<p>{{this.explanation}}</p>
+<hr style="width:30%;background-color:white">
+{{/each}}
+<form action="/user/addquestion" method="get" >
+
+</div>
+
+ <script>
+        if({{quiz.status}}==1)
+        {   document.getElementById('publishtext').innerText = 'Published'
+        document.getElementById('publish').style.display = 'none'; //Will show
+        }
+        else
+        document.getElementById('publishtext').innerText = 'Not Published Yet'
+
+    </script>

@@ -1,0 +1,19 @@
+ <form action="/user/createquiz" method="POST" >
+        <div class="form-group">
+        <label class="text-light" >Quiz Name</label>
+        <input required type="text" class="form-control" name="name" placeholder="Quiz Name" value="{{quiz.name}}">  
+        </div>
+         <div class="form-group">
+        <button type="submit" class="btn btn-info btn-lg active"><i class="fa"></i>createquiz</button>
+
+    </div>
+    
+    </form>
+
+    
+    <table class="table table-dark table-hover ">
+    <tr><th>Quiz Name</th></tr>
+    {{# each quizzes}}
+    <tr><td><a href="showquiz?id={{this.id}}">{{this.name}}</a></td></tr>
+    {{/each}}
+    </table>
