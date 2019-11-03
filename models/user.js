@@ -26,9 +26,10 @@ const userSchema =new mongoose.Schema({
         required: true ,
         required: 'password is required'   
     },
-    quizes:[
-        mongoose.SchemaTypes.ObjectId
-    ]
+    status:{
+        type:Number,
+        default:0
+    }
   
 })
 module.exports.user =mongoose.model("user", userSchema)

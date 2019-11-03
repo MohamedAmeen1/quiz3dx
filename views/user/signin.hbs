@@ -1,20 +1,23 @@
 <form action="/user/signin" method="POST" >
      <div class="form-group">
         <label>Email</label>
-        <input type="text" class="form-control" name="email" placeholder="Email" value="{{user.email}}">     
+        <input required type="text" class="form-control" name="email" placeholder="Email" value="{{user.email}}">     
         
     </div>
      <div class="form-group">
         <label>Password</label>
-        <input type="password" class="form-control" name="password" placeholder="password" value="{{user.password}}">     
+        <input required type="password" class="form-control" name="password" placeholder="password" value="{{user.password}}">     
         
     </div>
     <div class="text-danger">
             {{user.Error}}
         </div>
-        
     <div class="form-group">
         <button type="submit" class="btn btn-info"><i class="fa"></i> Sign In</button>
     </div>
+    <br>
+    <div class="form-group">
+        <button type="submit" formaction="/user/forgetpassword" class="btn btn-info"><i class="fa"></i>Forget Password !!</button>
+    </div>  
 
 </form>

@@ -13,6 +13,10 @@ router.get('/signup',(req,res)=>{
     
     res.render('user/signup')
 })
+router.get('/emailsend',(req,res)=>{
+    
+    res.render('user/emailsend')
+})
 router.get('/signin',(req,res)=>{
     res.render('user/signin')
 })
@@ -91,7 +95,6 @@ router.post('/signup',async (req,res)=>{
         return res.render('user/signup',{
         user: req.body
     })}
-    helper.send_mail("http://localhost:4000",req.body.email)
     let new_user=new user()
     new_user.name=req.body.name
     new_user.email=req.body.email
@@ -108,9 +111,9 @@ router.post('/signup',async (req,res)=>{
         })}
         else
         {
-            let token=jwt.sign({id:user._id}, process.env.user_private_key)
-            res.cookie('quizUserToken', token);
-            res.redirect('wellcome')
+            let token=jwt.sign({id:user._id}, process.env.user_private_key,{ expiresIn: '2h' })
+            helper.send_mail("http://quiz3dx-env.vtekns9fvr.us-east-1.elasticbeanstalk.com/user/verifyemail/"+token,req.body.email)
+            res.redirect('emailsend')
         }
     }) 
 })
@@ -120,6 +123,13 @@ router.post('/signin',(req,res)=>{
         if (err || user==null) {
              req.body.Error="Wrong Email"
              return  res.render('user/signin',{
+                user: req.body
+            })
+        }
+        else if(user.status!=1)
+        {
+            req.body.Error="Your Email is not verified yet"
+            return  res.render('user/signin',{
                 user: req.body
             })
         }
@@ -138,6 +148,47 @@ router.post('/signin',(req,res)=>{
         }
     })
     
+})
+router.get('/verifyemail/:token',(req,res)=>{
+    const {id} = jwt.verify(req.params.token,process.env.user_private_key)
+    user.findByIdAndUpdate(id,{status:1},(err,user)=>{
+        if(err)
+        res.redirect('/user/signup')
+        else
+        res.redirect('/user/emailverified')
+    })
+    
+})
+router.get('/emailverified',(req,res)=>{
+    res.render('user/emailverified')
+})
+router.post('/forgetpassword',(req,res)=>{
+    user.findOne({email:req.body.email},(err,user)=>{
+        if(err)
+        res.redirect('/user/signin')
+        else
+        {
+            let token=jwt.sign({id:user._id}, process.env.user_private_key,{ expiresIn: '2h' })
+            helper.send_mail("http://quiz3dx-env.vtekns9fvr.us-east-1.elasticbeanstalk.com/user/changepassword?id="+token,req.body.email)
+            res.redirect('emailsend')
+        }
+    })
+})
+router.get('/changepassword',(req,res)=>{
+    res.render('user/changepassword',{id:req.query.id})
+})
+router.post('/changepassword',async(req,res)=>{
+    let token=req.body.token
+    const {id} = jwt.verify(token,process.env.user_private_key)
+    let cipher_pass=await helper.encrypt(req.body.password)
+    user.findByIdAndUpdate(id,{password:cipher_pass},(err,user)=>{
+        if(err)
+       {
+            res.redirect('/user/signin')}
+        else
+        res.redirect('/user/signin')
+    })
+
 })
 router.get('/deletequestion',auth,(req,res)=>{
     quiz.findOneAndUpdate({owner:mongoose.Types.ObjectId(req.user_id),_id:req.query.qid},{ $pull:{ questions:{_id:req.query.id}}},(err,quiz)=>{
